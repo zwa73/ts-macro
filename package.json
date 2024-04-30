@@ -1,6 +1,6 @@
 {
 	"name": "@zwa73/macro",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "用于动态生成/替换区域内代码",
 	"main": "index.js",
 	"scripts": {
@@ -33,7 +33,7 @@
 		"url": "git+https://github.com/zwa73/ts-macro.git"
 	},
 	"bugs": {
-		"url": "https://github.com/zwa73/typescript-macro/issues"
+		"url": "https://github.com/zwa73/ts-macro/issues"
 	},
-	"homepage": "https://github.com/zwa73/typescript-macro#readme"
+	"homepage": "https://github.com/zwa73/ts-macro#readme"
 }
