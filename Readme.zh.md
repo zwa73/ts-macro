@@ -61,6 +61,6 @@ npx zmacro Build-Macro --include "src/**/*.macro.ts" --project "tsconfig.json"
 ## 安装
 
 ```powershell
-npm i @zwa73/macro
+npm i --save-dev @zwa73/macro
 ```
 

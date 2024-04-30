@@ -1,6 +1,6 @@
 {
 	"name": "@zwa73/macro",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "用于动态生成/替换区域内代码",
 	"main": "index.js",
 	"scripts": {
@@ -15,6 +15,7 @@
 	"dependencies": {
 		"commander": "^11.1.0",
 		"glob": "^10.3.12",
+		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0"
 	},
 	"bin": {
@@ -22,5 +23,14 @@
 	},
 	"devDependencies": {
 		"@types/node": "^20.12.7"
-	}
+	},
+	"types": "./index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zwa73/typescript-macro.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zwa73/typescript-macro/issues"
+	},
+	"homepage": "https://github.com/zwa73/typescript-macro#readme"
 }

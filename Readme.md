@@ -60,5 +60,5 @@ This command will run all files matching src/**/*.macro.ts and generate code as 
 ## Installs
 
 ```powershell
-npm i @zwa73/macro
+npm i --save-dev @zwa73/macro
 ```
