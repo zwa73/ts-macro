@@ -30,7 +30,7 @@
 	"types": "./index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/zwa73/typescript-macro.git"
+		"url": "git+https://github.com/zwa73/ts-macro.git"
 	},
 	"bugs": {
 		"url": "https://github.com/zwa73/typescript-macro/issues"
