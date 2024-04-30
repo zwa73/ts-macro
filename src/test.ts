@@ -17,3 +17,4 @@ type Test2 = 2
 type Test3 = 3
 //#endregion3
 45
+"rename"
