@@ -1,0 +1,26 @@
+{
+	"name": "@zwa73/macro",
+	"version": "1.0.1",
+	"description": "用于动态生成/替换区域内代码",
+	"main": "index.js",
+	"scripts": {
+		"compile": "powershell scripts/compile.ps1",
+		"release": "powershell scripts/release.ps1"
+	},
+	"keywords": [
+		"macro"
+	],
+	"author": "zwa73",
+	"license": "ISC",
+	"dependencies": {
+		"commander": "^11.1.0",
+		"glob": "^10.3.12",
+		"tsconfig-paths": "^4.2.0"
+	},
+	"bin": {
+		"build-macro": "bin/macro"
+	},
+	"devDependencies": {
+		"@types/node": "^20.12.7"
+	}
+}

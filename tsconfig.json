@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "strict": true,
+        "target": "ES2022",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "outDir": "./dist",
+        "declaration": true,
+        "baseUrl": ".",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "paths": {
+            "@src/*": ["./src/*"],
+            "@/*": ["./*"],
+            "@": ["./src/index"]
+        }
+    },
+    "include": ["./src/**/*.ts", "./src/**/*.js", "./jest/**/*.ts"],
+    "exclude": ["./node_modules/**/*"]
+}
