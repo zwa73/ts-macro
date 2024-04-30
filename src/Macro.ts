@@ -157,12 +157,14 @@ export async function $macro(regionId:string,codeText:string,targetPath?:string)
             return
         };
         const text = await fs.promises.readFile(baseFilePath,'utf-8');
-        const regex = new RegExp(`(//#region ${regionId}(\\n|\\s+?))([\\s\\S]+?)(//#endregion)`);
+        const regex = new RegExp(
+            `(//#region ${regionId}\\s*?\\n)([\\s\\S]*?)(//#endregion)`
+        );
         if (!regex.test(text)) {
             console.error(`$macro 无法找到区域 ${regionId}`);
             return;
         }
-        const ntext = text.replace(regex, `$1${codeText}\n$4`);
+        const ntext = text.replace(regex, `$1${codeText}\n$3`);
         await fs.promises.writeFile(baseFilePath, ntext, 'utf-8');
     }
 

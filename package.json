@@ -1,6 +1,6 @@
 {
 	"name": "@zwa73/macro",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "用于动态生成/替换区域内代码",
 	"main": "index.js",
 	"scripts": {
