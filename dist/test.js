@@ -12,3 +12,4 @@
 44;
 //#endregion3
 45;
+"rename main";
