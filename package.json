@@ -1,6 +1,6 @@
 {
 	"name": "@zwa73/macro",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "用于动态生成/替换区域内代码",
 	"main": "index.js",
 	"scripts": {
@@ -8,7 +8,10 @@
 		"release": "powershell scripts/release.ps1"
 	},
 	"keywords": [
-		"macro"
+		"typescript",
+		"macro",
+		"code generation",
+		"cli tool"
 	],
 	"author": "zwa73",
 	"license": "ISC",
