@@ -153,13 +153,17 @@ async function $macro(regionId, codeText, targetPath) {
             return;
         }
         ;
-        const text = await fs_1.default.promises.readFile(baseFilePath, 'utf-8');
-        const regex = new RegExp(`(//#region ${regionId}\\s*?\\n)([\\s\\S]*?)(//#endregion)`);
-        if (!regex.test(text)) {
+        const text = (await fs_1.default.promises.readFile(baseFilePath, 'utf-8')).replaceAll("\r\n", "\n");
+        const getregex = () => new RegExp(`([^\\S\\n]*)(//#region ${regionId}(?!\\S).*\\n)` +
+            /([\s\S]*?)/.source +
+            /([^\S\n]*\/\/#endregion(?!\S).*)/.source, "g");
+        if (!(getregex().test(text))) {
             console.error(`$macro 无法找到区域 ${regionId}`);
             return;
         }
-        const ntext = text.replace(regex, `$1${codeText}\n$3`);
+        const match = getregex().exec(text);
+        const mapText = codeText.split('\n').map((line) => `${match[1]}${line}`).join('\n');
+        const ntext = text.replace(getregex(), `$1$2${mapText}\n$4`);
         await fs_1.default.promises.writeFile(baseFilePath, ntext, 'utf-8');
     };
     await queueProc(path_1.default.posix.normalize(baseFilePath.replaceAll("\\", "/")), queuefunc);
