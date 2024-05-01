@@ -1,5 +1,5 @@
-import { $macro } from "./Macro";
+import { regionMacro } from "./Macro";
 
-$macro("testmacro1","type Test1 = 1");
-$macro("testmacro2","type Test2 = 2");
-$macro("testmacro3","type Test3 = 3");
+regionMacro("testmacro1","type Test1 = 1");
+regionMacro("testmacro2","type Test2 = 2");
+regionMacro("testmacro3","type Test3 = 3");

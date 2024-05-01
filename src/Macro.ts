@@ -137,19 +137,27 @@ function exec(command: string) {
         });
     });
 }
+
+/**宏的可选参数 */
+type MacroOpt = {
+    /**宏展开的目标文件 */
+    targetPath:string;
+}
+
 /**将codeText写入对应region  
  * @param regionId   - 区域id
  * @param codeText   - 文本
- * @param targetPath - 目标文件 默认为去除".macro"的同名文件
+ * @param opt        - 可选参数
+ * @param opt.targetPath - 目标文件 默认为去除".macro"的同名文件
  */
-export async function $macro(regionId:string,codeText:string,targetPath?:string){
+export async function regionMacro(regionId:string,codeText:string|(()=>string|Promise<string>),opt?:MacroOpt){
     const loc = getFuncLoc(2);
     if(!loc){
-        console.error(`$macro 未能找到函数位置`);
+        console.error(`macro 未能找到函数位置`);
         return
     };
-    const baseFilePath = targetPath
-        ? path.resolve(process.cwd(),targetPath)
+    const baseFilePath = opt?.targetPath
+        ? path.resolve(process.cwd(),opt.targetPath)
         : loc.filePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/,"$1.$2");
     const queuefunc = async ()=>{
         if(!(await pathExists(baseFilePath))) {
@@ -167,7 +175,8 @@ export async function $macro(regionId:string,codeText:string,targetPath?:string)
             return;
         }
         const match = getregex().exec(text)!;
-        const mapText = codeText.split('\n').map((line)=>`${match[1]}${line}`).join('\n');
+        const strText = typeof codeText === "function" ? await codeText() : codeText;
+        const mapText = strText.split('\n').map((line)=>`${match[1]}${line}`).join('\n');
         const ntext = text.replace(getregex(), `$1$2${mapText}\n$4`);
         await fs.promises.writeFile(baseFilePath, ntext, 'utf-8');
     }

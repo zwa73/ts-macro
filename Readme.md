@@ -6,24 +6,24 @@ This package provides a macro for code generation/precompilation.
 
 ## Features
 
-- Use `$macro` to write text into a specific region in a file.
+- Use `regionMacro` to write text into a specific region in a file.
 - A command-line interface based on macros for generating code.
 
 ## Usage
 
-### $macro
+### regionMacro
 
 The function writes text into a specific region in a file. It accepts a region ID, the text to be written, and an optional target file path.
 
 ```typescript
-import {$macro} from '@zwa73/macro';
-$macro('regionId', 'codeText', 'path/to/target.ts');
+import {regionMacro} from '@zwa73/macro';
+regionMacro('regionId', 'codeText', 'path/to/target.ts');
 ```
 In `src/test.macro.ts`:
 
 ```typescript
-import {$macro} from '@zwa73/macro';
-$macro('macrotest', 'type Test = 1;');
+import {regionMacro} from '@zwa73/macro';
+regionMacro('macrotest', 'type Test = 1;');
 ```
 In `src/test.ts`:
 

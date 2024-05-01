@@ -6,24 +6,24 @@
 
 ## 特性
 
-- 使用 `$macro` 将文本写入文件中的特定区域。
+- 使用 `regionMacro` 将文本写入文件中的特定区域。
 - 一个基于宏生成代码的命令行接口。
 
 ## 使用方法
 
-### $macro
+### regionMacro
 
 函数将文本写入文件中的特定区域。它接受一个区域 ID，要写入的文本，以及一个可选的目标文件路径。
 
 ``` typescript
-import {$macro} from '@zwa73/macro';
-$macro('regionId', 'codeText', 'path/to/target.ts');
+import {regionMacro} from '@zwa73/macro';
+regionMacro('regionId', 'codeText', 'path/to/target.ts');
 ```
 在 `src/test.macro.ts` 中:  
 
 ``` typescript
-import {$macro} from '@zwa73/macro';
-$macro('macrotest', 'type Test = 1;');
+import {regionMacro} from '@zwa73/macro';
+regionMacro('macrotest', 'type Test = 1;');
 ```
 在 `src/test.ts` 中:  
 

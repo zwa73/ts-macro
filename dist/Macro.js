@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.command = exports.$macro = void 0;
+exports.command = exports.regionMacro = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const child_process_1 = __importDefault(require("child_process"));
@@ -135,17 +135,18 @@ function exec(command) {
 /**将codeText写入对应region
  * @param regionId   - 区域id
  * @param codeText   - 文本
- * @param targetPath - 目标文件 默认为去除".macro"的同名文件
+ * @param opt        - 可选参数
+ * @param opt.targetPath - 目标文件 默认为去除".macro"的同名文件
  */
-async function $macro(regionId, codeText, targetPath) {
+async function regionMacro(regionId, codeText, opt) {
     const loc = getFuncLoc(2);
     if (!loc) {
-        console.error(`$macro 未能找到函数位置`);
+        console.error(`macro 未能找到函数位置`);
         return;
     }
     ;
-    const baseFilePath = targetPath
-        ? path_1.default.resolve(process.cwd(), targetPath)
+    const baseFilePath = opt?.targetPath
+        ? path_1.default.resolve(process.cwd(), opt.targetPath)
         : loc.filePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/, "$1.$2");
     const queuefunc = async () => {
         if (!(await pathExists(baseFilePath))) {
@@ -162,13 +163,14 @@ async function $macro(regionId, codeText, targetPath) {
             return;
         }
         const match = getregex().exec(text);
-        const mapText = codeText.split('\n').map((line) => `${match[1]}${line}`).join('\n');
+        const strText = typeof codeText === "function" ? await codeText() : codeText;
+        const mapText = strText.split('\n').map((line) => `${match[1]}${line}`).join('\n');
         const ntext = text.replace(getregex(), `$1$2${mapText}\n$4`);
         await fs_1.default.promises.writeFile(baseFilePath, ntext, 'utf-8');
     };
     await queueProc(path_1.default.posix.normalize(baseFilePath.replaceAll("\\", "/")), queuefunc);
 }
-exports.$macro = $macro;
+exports.regionMacro = regionMacro;
 function command() {
     const program = new commander_1.Command();
     program
