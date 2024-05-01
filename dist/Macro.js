@@ -80,7 +80,7 @@ async function pathExists(filePath) {
  */
 function getFuncLoc(stack = 1) {
     const stackLines = new Error().stack.split('\n');
-    const regex = /([a-zA-Z]+?:.+?):(\d+?:\d+?)/;
+    const regex = /([a-zA-Z]+?:.+?):(\d+?:\d+)/;
     //console.log(stackLines)
     const match = regex.exec(stackLines[stack + 1]);
     if (match) {

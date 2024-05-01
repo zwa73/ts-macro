@@ -1,7 +1,7 @@
 {
 	"name": "@zwa73/macro",
-	"version": "1.0.7",
-	"description": "用于动态生成/替换区域内代码",
+	"version": "1.0.8",
+	"description": "macro for code generation/precompilation",
 	"main": "index.js",
 	"scripts": {
 		"compile": "powershell scripts/compile.ps1",
