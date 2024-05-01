@@ -178,8 +178,8 @@ export async function $macro(regionId:string,codeText:string,targetPath?:string)
 export function command(){
     const program = new Command();
     program
-        .command("Build-Macro")
-        .alias("buildmacro")
+        .command("Expand-Macro")
+        .alias("expandmacro")
         .description("生成根据macro生成代码")
         .option("-i, --include <glob>", "包含的glob 默认 src/**/*.macro.ts","src/**/*.macro.ts")
         .option("-g, --exclude <glob>", "忽略的glob")
