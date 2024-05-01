@@ -52,7 +52,7 @@ This package also provides a command-line interface for generating code based on
 - -p, --project <path> Path to tsconfig, default is tsconfig.json  
 
 ```powershell
-npx zmacro Build-Macro --include "src/**/*.macro.ts" --project "tsconfig.json"
+npx zmacro Expand-Macro --include "src/**/*.macro.ts" --project "tsconfig.json"
 ```
 
 This command will run all files matching src/**/*.macro.ts and generate code as shown in the example above.

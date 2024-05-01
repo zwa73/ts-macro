@@ -53,7 +53,7 @@ console.log(2);
 
 
 ``` powershell
-npx zmacro Build-Macro --include "src/**/*.macro.ts" --project "tsconfig.json"
+npx zmacro Expand-Macro --include "src/**/*.macro.ts" --project "tsconfig.json"
 ```
 
 这个指令会运行所有src/**/*.macro.ts匹配的文件, 如上述示例那样生成代码
