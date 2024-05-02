@@ -13,34 +13,77 @@
 
 ### regionMacro
 
-函数将文本写入文件中的特定区域。它接受一个区域 ID，要写入的文本，以及一个可选的目标文件路径。
+`regionMacro`函数将`codeText`写入对应的区域。
 
-``` typescript
+- `regionId`：区域id `//#region ${id}`。
+- `codeText`：要写入的文本。
+- `opt`：可选参数。
+  - `opt.filePath`：目标文件。默认是没有".macro"的同名文件。
+  - `opt.glob`：使用glob匹配而不是文件路径。
+
+当你想在文件的指定区域写入特定的代码文本时，可以使用此函数。
+
+### commentMacro
+
+`commentMacro`函数将`codeText`写入对应的注释下方。
+
+- `commentId`：注释id `// ${id}`。
+- `codeText`：要写入的文本。
+- `opt`：可选参数。
+  - `opt.filePath`：目标文件。默认是没有".macro"的同名文件。
+  - `opt.glob`：使用glob匹配而不是文件路径。
+
+当你想在文件的指定注释下方写入特定的代码文本时，可以使用此函数。
+
+### fileMacro
+
+`fileMacro`函数将`codeText`写入对应的文件。如果文件不存在，它将被创建。
+
+- `codeText`：要写入的文本。
+- `opt`：可选参数。
+  - `opt.filePath`：目标文件。默认是没有".macro"的同名文件。
+  - `opt.glob`：使用glob匹配而不是文件路径。
+
+当你想在指定的文件中写入特定的代码文本时，可以使用此函数。如果文件不存在，它将被创建。
+
+## 示例
+
+在 `src/test.macro.ts`:
+
+```typescript
 import {regionMacro} from '@zwa73/macro';
-regionMacro('regionId', 'codeText', 'path/to/target.ts');
+regionMacro('region1', 'type Region = 1;');
+commentMacro('comment1', 'type Comment = 1;');
+fileMacro('type FileMacro = 1;',{filePath:'src/testFileMacro.ts'});
 ```
-在 `src/test.macro.ts` 中:  
+在 `src/test.ts`:
 
-``` typescript
-import {regionMacro} from '@zwa73/macro';
-regionMacro('macrotest', 'type Test = 1;');
-```
-在 `src/test.ts` 中:  
-
-``` typescript
+```typescript
 console.log(1);
-//#region macrotest
+//#region region1
 //#endregion
 console.log(2);
+// comment1
+// comment2
+// comment3
 ```
-执行后, 在 `src/test.ts` 中:  
+执行后, 在 `src/test.ts`:
 
-``` typescript
+```typescript
 console.log(1);
-//#region macrotest
-type Test = 1;
+//#region region1
+type Region = 1;
 //#endregion
 console.log(2);
+// comment1
+type Comment = 1;
+// comment3
+```
+
+并且创建 `src/testFileMacro.ts`:
+
+```typescript
+type FileMacro = 1;
 ```
 
 ### 命令行接口

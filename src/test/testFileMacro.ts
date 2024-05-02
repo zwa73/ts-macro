@@ -1,0 +1,1 @@
+type FileMacro = 5

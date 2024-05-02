@@ -13,34 +13,77 @@ This package provides a macro for code generation/precompilation.
 
 ### regionMacro
 
-The function writes text into a specific region in a file. It accepts a region ID, the text to be written, and an optional target file path.
+The `regionMacro` function writes the `codeText` into the corresponding region.
 
-```typescript
-import {regionMacro} from '@zwa73/macro';
-regionMacro('regionId', 'codeText', 'path/to/target.ts');
-```
+- `regionId`: The region id `//#region ${id}`.
+- `codeText`: The text to be written.
+- `opt`: Optional parameters.
+  - `opt.filePath`: The target file. The default is the same name file without ".macro".
+  - `opt.glob`: Use glob matching instead of file path.
+
+This function is used when you want to write specific code text into a designated region in a file.
+
+### commentMacro
+
+The `commentMacro` function writes the `codeText` under the corresponding comment.
+
+- `commentId`: The comment id `// ${id}`.
+- `codeText`: The text to be written.
+- `opt`: Optional parameters.
+  - `opt.filePath`: The target file. The default is the same name file without ".macro".
+  - `opt.glob`: Use glob matching instead of file path.
+
+This function is used when you want to write specific code text under a designated comment in a file.
+
+### fileMacro
+
+The `fileMacro` function writes the `codeText` into the corresponding file. If the file does not exist, it will be created.
+
+- `codeText`: The text to be written.
+- `opt`: Optional parameters.
+  - `opt.filePath`: The target file. The default is the same name file without ".macro".
+  - `opt.glob`: Use glob matching instead of file path.
+
+This function is used when you want to write specific code text into a designated file. If the file does not exist, it will be created.
+
+## Example
+
 In `src/test.macro.ts`:
 
 ```typescript
 import {regionMacro} from '@zwa73/macro';
-regionMacro('macrotest', 'type Test = 1;');
+regionMacro('region1', 'type Region = 1;');
+commentMacro('comment1', 'type Comment = 1;');
+fileMacro('type FileMacro = 1;',{filePath:'src/testFileMacro.ts'});
 ```
 In `src/test.ts`:
 
 ```typescript
 console.log(1);
-//#region macrotest
+//#region region1
 //#endregion
 console.log(2);
+// comment1
+// comment2
+// comment3
 ```
 After execution, in `src/test.ts`:
 
 ```typescript
 console.log(1);
-//#region macrotest
-type Test = 1;
+//#region region1
+type Region = 1;
 //#endregion
 console.log(2);
+// comment1
+type Comment = 1;
+// comment3
+```
+
+And create `src/testFileMacro.ts`:
+
+```typescript
+type FileMacro = 1;
 ```
 
 ### Command-Line Interface
