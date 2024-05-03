@@ -79,12 +79,40 @@ console.log(2);
 type Comment = 1;
 // comment3
 ```
-
 并且创建 `src/testFileMacro.ts`:
 
 ```typescript
 type FileMacro = 1;
 ```
+或者更多:
+
+```typescript
+function exportComment(glob:string){
+    commentMacro(/export (\S*)/,({filePath,execArr})=>{
+        const basedir = path.dirname(filePath).replaceAll('\\','/');
+        const result = fileSearchGlob(basedir,execArr[1],{normalize:'posix'})
+            .map((file)=>path.posix.relative(basedir,file))
+            .map((file)=>path.parse(file).name)
+            .filter((file)=>file!=path.parse(filePath).name)
+            .map((file)=>`export * from './${file}'`)
+            .join(';');
+        return result.length>0? `${result};` : result;
+    },{glob:true,filePath:glob});
+}
+exportComment('src/**/index.ts');
+```
+在任何 `index.ts`:
+
+```typescript
+// export *
+```
+执行后:
+
+```typescript
+// export *
+import * from './YouModule1';import * from './YouModule2'; //...
+```
+
 
 ### 命令行接口
 

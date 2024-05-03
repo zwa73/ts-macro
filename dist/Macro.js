@@ -67,6 +67,7 @@ async function regionMacro(regionId, codeText, opt) {
                 const ol = fileText.length;
                 const parseCode = await parseCodeText(codeText, {
                     matchId: idmatch[0],
+                    execArr: idmatch,
                     text: (0, MiniReq_1.dedent)(content),
                     inent,
                     filePath
@@ -120,6 +121,7 @@ async function commentMacro(commentId, codeText, opt) {
                 const ol = fileText.length;
                 const parseCode = await parseCodeText(codeText, {
                     matchId: idmatch[0],
+                    execArr: idmatch,
                     text: (0, MiniReq_1.dedent)(content),
                     inent,
                     filePath
@@ -154,7 +156,13 @@ async function fileMacro(codeText, opt) {
         const queuefunc = async () => {
             await MiniReq_1.UtilFT.ensurePathExists(filePath);
             const text = await readFile(filePath);
-            const parseCode = await parseCodeText(codeText, { matchId: '', text, inent: '', filePath });
+            const parseCode = await parseCodeText(codeText, {
+                matchId: '',
+                execArr: /''/.exec(''),
+                text,
+                inent: '',
+                filePath
+            });
             await fs_1.default.promises.writeFile(filePath, parseCode, 'utf-8');
         };
         plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));

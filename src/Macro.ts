@@ -15,6 +15,8 @@ type MacroOpt = Partial<{
 type CodeTextOpt = {
     /**匹配的region/comment id */
     matchId:string;
+    /**region/comment id正则的执行结果*/
+    execArr:RegExpExecArray;
     /**展开宏的目标文件 */
     filePath:string;
     /**展开宏区域的原文本 */
@@ -85,6 +87,7 @@ export async function regionMacro(regionId:string|RegExp,codeText:string|((opt:C
                 const ol = fileText.length;
                 const parseCode = await parseCodeText(codeText,{
                     matchId :idmatch[0],
+                    execArr :idmatch,
                     text    :dedent(content),
                     inent   ,
                     filePath
@@ -138,6 +141,7 @@ export async function commentMacro(commentId:string|RegExp,codeText:string|((opt
                 const ol = fileText.length;
                 const parseCode = await parseCodeText(codeText,{
                     matchId :idmatch[0],
+                    execArr :idmatch,
                     text    :dedent(content),
                     inent   ,
                     filePath
@@ -163,14 +167,20 @@ export async function commentMacro(commentId:string|RegExp,codeText:string|((opt
  * @param opt.filePath - 目标文件 默认为去除".macro"的同名文件
  * @param opt.glob     - 使用glob匹配而非文件路径
  */
-export async function fileMacro(codeText:string|((opt:CodeTextOpt)=>string|Promise<string>),opt?:MacroOpt){
+export async function fileMacro(codeText:string|((opt:Omit<CodeTextOpt,'ident'|'matchId'|'execArr'>)=>string|Promise<string>),opt?:MacroOpt){
     const plist:Promise<void>[] = [];
     const filePaths = parseMacroPaths(opt);
     for(const filePath of filePaths){
         const queuefunc = async ()=>{
             await UtilFT.ensurePathExists(filePath);
             const text = await readFile(filePath);
-            const parseCode = await parseCodeText(codeText,{matchId:'',text,inent:'',filePath});
+            const parseCode = await parseCodeText(codeText,{
+                matchId:'',
+                execArr:/''/.exec('')!,
+                text,
+                inent:'',
+                filePath
+            });
             await fs.promises.writeFile(filePath, parseCode, 'utf-8');
         }
         plist.push(UtilFunc.queueProc(path.posix.normalize(filePath.replaceAll("\\","/")),queuefunc))

@@ -9,6 +9,8 @@ type MacroOpt = Partial<{
 type CodeTextOpt = {
     /**匹配的region/comment id */
     matchId: string;
+    /**region/comment id正则的执行结果*/
+    execArr: RegExpExecArray;
     /**展开宏的目标文件 */
     filePath: string;
     /**展开宏区域的原文本 */
@@ -38,5 +40,5 @@ export declare function commentMacro(commentId: string | RegExp, codeText: strin
  * @param opt.filePath - 目标文件 默认为去除".macro"的同名文件
  * @param opt.glob     - 使用glob匹配而非文件路径
  */
-export declare function fileMacro(codeText: string | ((opt: CodeTextOpt) => string | Promise<string>), opt?: MacroOpt): Promise<void>;
+export declare function fileMacro(codeText: string | ((opt: Omit<CodeTextOpt, 'ident' | 'matchId' | 'execArr'>) => string | Promise<string>), opt?: MacroOpt): Promise<void>;
 export {};
