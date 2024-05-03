@@ -1,6 +1,6 @@
 {
 	"name": "@zwa73/macro",
-	"version": "1.0.15",
+	"version": "1.0.16",
 	"description": "macro for code generation/precompilation",
 	"main": "index.js",
 	"scripts": {

@@ -91,4 +91,5 @@ export declare namespace SLogger {
  * //     World!
  */
 export declare function dedent(input: TemplateStringsArray | string, ...values: any[]): string;
+export declare function throwError(str?: string): never;
 export {};

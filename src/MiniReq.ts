@@ -202,3 +202,7 @@ export function dedent(input: TemplateStringsArray|string, ...values: any[]): st
     );
     return lines.map(line => line.slice(minIndent)).join('\n');
 }
+
+export function throwError(str?:string):never{
+    throw str
+}

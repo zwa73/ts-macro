@@ -51,7 +51,7 @@ This function is used when you want to write specific code text into a designate
 In `src/test.macro.ts`:
 
 ```typescript
-import {regionMacro} from '@zwa73/macro';
+import {regionMacro,commentMacro,fileMacro} from '@zwa73/macro';
 regionMacro('region1', 'type Region = 1;');
 commentMacro('comment1', 'type Comment = 1;');
 fileMacro('type FileMacro = 1;',{filePath:'src/testFileMacro.ts'});

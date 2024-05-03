@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dedent = exports.SLogger = exports.UtilFunc = exports.UtilFT = void 0;
+exports.throwError = exports.dedent = exports.SLogger = exports.UtilFunc = exports.UtilFT = void 0;
 const glob_1 = require("glob");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -193,3 +193,7 @@ function dedent(input, ...values) {
     return lines.map(line => line.slice(minIndent)).join('\n');
 }
 exports.dedent = dedent;
+function throwError(str) {
+    throw str;
+}
+exports.throwError = throwError;

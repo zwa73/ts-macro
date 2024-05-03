@@ -8,18 +8,25 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const MiniReq_1 = require("./MiniReq");
 //#region macro工具
-const parseMacroPaths = (basePath, opt) => {
+const parseMacroPaths = (opt) => {
+    const loc = MiniReq_1.UtilFunc.getFuncLoc(3);
+    if (!loc && !opt?.filePath)
+        (0, MiniReq_1.throwError)(`parseMacroPaths 未能找到函数位置`);
+    const basePath = loc?.filePath;
     return opt?.filePath
         ? opt.glob
-            ? MiniReq_1.UtilFT.fileSearchGlob(process.cwd(), opt.filePath)
-            : typeof opt?.filePath === "string" ? [opt?.filePath] : opt?.filePath
-        : [basePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/, "$1.$2")];
+            ? MiniReq_1.UtilFT.fileSearchGlob(process.cwd(), opt.filePath, { normalize: "posix" })
+            : typeof opt?.filePath === "string"
+                ? [opt?.filePath.replaceAll('\\', '/')]
+                : opt?.filePath.map((filepath) => filepath.replaceAll('\\', '/'))
+        : [basePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/, "$1.$2").replaceAll('\\', '/')];
 };
 const readFile = async (basePath) => (await fs_1.default.promises.readFile(basePath, 'utf-8')).replaceAll("\r\n", "\n");
 const parseCodeText = async (codeText, opt) => {
     const strText = typeof codeText === "function" ? await codeText(opt) : codeText;
     return strText.split('\n').map((line) => `${opt.inent}${line}`).join('\n');
 };
+const literalRegex = (str) => new RegExp(`^${str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}(?!\\S)`);
 //#endregion
 /**将codeText写入对应region
  * @param regionId   - 区域id \`//#region ${id}\`
@@ -29,32 +36,48 @@ const parseCodeText = async (codeText, opt) => {
  * @param opt.glob     - 使用glob匹配而非文件路径
  */
 async function regionMacro(regionId, codeText, opt) {
-    const loc = MiniReq_1.UtilFunc.getFuncLoc(2);
-    if (!loc) {
-        MiniReq_1.SLogger.error(`UtilDT.regionMacro 未能找到函数位置`);
-        return;
-    }
     const plist = [];
-    const filePaths = parseMacroPaths(loc.filePath, opt);
+    const filePaths = parseMacroPaths(opt);
     for (const filePath of filePaths) {
         const queuefunc = async () => {
             if (!(await MiniReq_1.UtilFT.pathExists(filePath))) {
                 MiniReq_1.SLogger.error(`UtilDT.regionMacro ${filePath} 不存在`);
                 return;
             }
-            const text = await readFile(filePath);
-            const getregex = () => new RegExp(`([^\\S\\n]*)(//#region ${regionId}(?!\\S).*\\n)` +
+            let fileText = await readFile(filePath);
+            const regex = new RegExp(/(^|\n)([^\S\n]*)(\/\/#region (.*)\n)/.source +
                 /([\s\S]*?)/.source +
                 /([^\S\n]*\/\/#endregion(?!\S).*)/.source, "g");
-            if (!getregex().test(text)) {
-                if (!opt?.glob)
-                    MiniReq_1.SLogger.error(`UtilDT.regionMacro 无法找到区域 ${regionId}`);
-                return;
+            regex.lastIndex = 0;
+            let match;
+            let hasMatch = false;
+            while (match = regex.exec(fileText)) {
+                const id = match[4];
+                const prefix = match[1];
+                const content = match[5];
+                const inent = match[2];
+                const comment = match[3];
+                const endcomment = match[6];
+                const idregex = typeof regionId === "string"
+                    ? literalRegex(regionId) : regionId;
+                let idmatch = idregex.exec(id);
+                if (idmatch == null)
+                    continue;
+                hasMatch = true;
+                const ol = fileText.length;
+                const parseCode = await parseCodeText(codeText, {
+                    matchId: idmatch[0],
+                    text: (0, MiniReq_1.dedent)(content),
+                    inent,
+                    filePath
+                });
+                fileText = fileText.replace(match[0], `${prefix}${inent}${comment}${parseCode}\n${endcomment}`);
+                regex.lastIndex += fileText.length - ol;
             }
-            const match = getregex().exec(text);
-            const parseCode = await parseCodeText(codeText, { text: (0, MiniReq_1.dedent)(match[3]), inent: match[1], filePath });
-            const ntext = text.replace(getregex(), `$1$2${parseCode}\n$4`);
-            await fs_1.default.promises.writeFile(filePath, ntext, 'utf-8');
+            if (hasMatch)
+                await fs_1.default.promises.writeFile(filePath, fileText, 'utf-8');
+            else if (!opt?.glob)
+                MiniReq_1.SLogger.error(`UtilDT.regionMacro 无法找到区域 ${regionId}`);
         };
         plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));
     }
@@ -69,36 +92,49 @@ exports.regionMacro = regionMacro;
  * @param opt.glob     - 使用glob匹配而非文件路径
  */
 async function commentMacro(commentId, codeText, opt) {
-    const loc = MiniReq_1.UtilFunc.getFuncLoc(2);
-    if (!loc) {
-        MiniReq_1.SLogger.error(`UtilDT.commentMacro 未能找到函数位置`);
-        return;
-    }
     const plist = [];
-    const filePaths = parseMacroPaths(loc.filePath, opt);
+    const filePaths = parseMacroPaths(opt);
     for (const filePath of filePaths) {
         const queuefunc = async () => {
             if (!(await MiniReq_1.UtilFT.pathExists(filePath))) {
                 MiniReq_1.SLogger.error(`UtilDT.commentMacro ${filePath} 不存在`);
                 return;
             }
-            const text = await readFile(filePath);
-            const getregex = () => new RegExp(`([^\\S\\n]*)(// ${commentId}(?!\\S).*)` +
-                /(\n|)/.source +
+            let fileText = await readFile(filePath);
+            const regex = new RegExp(/(^|\n)([^\S\n]*)(\/\/ (.*))(\n|)/.source +
                 /([^\n]*)/.source, "g");
-            if (!getregex().test(text)) {
-                if (!opt?.glob)
-                    MiniReq_1.SLogger.error(`UtilDT.commentMacro 无法找到注释 ${commentId}`);
-                return;
+            let match;
+            let hasMatch = false;
+            while (match = regex.exec(fileText)) {
+                const id = match[4];
+                const prefix = match[1];
+                const content = match[6];
+                const inent = match[2];
+                const comment = match[3];
+                const idregex = typeof commentId === "string"
+                    ? literalRegex(commentId) : commentId;
+                let idmatch = idregex.exec(id);
+                if (idmatch == null)
+                    continue;
+                hasMatch = true;
+                const ol = fileText.length;
+                const parseCode = await parseCodeText(codeText, {
+                    matchId: idmatch[0],
+                    text: (0, MiniReq_1.dedent)(content),
+                    inent,
+                    filePath
+                });
+                if (parseCode.includes('\n')) {
+                    MiniReq_1.SLogger.error(`UtilDT.commentMacro 无法使用多行文本, 考虑使用regionMacro ${codeText}`);
+                    return;
+                }
+                fileText = fileText.replace(match[0], `${prefix}${inent}${comment}\n${parseCode}`);
+                regex.lastIndex += fileText.length - ol;
             }
-            const match = getregex().exec(text);
-            const parseCode = await parseCodeText(codeText, { text: match[3], inent: match[1], filePath });
-            if (parseCode.includes('\n')) {
-                MiniReq_1.SLogger.error(`UtilDT.commentMacro 无法使用多行文本, 考虑使用regionMacro ${codeText}`);
-                return;
-            }
-            const ntext = text.replace(getregex(), `$1$2\n${parseCode}`);
-            await fs_1.default.promises.writeFile(filePath, ntext, 'utf-8');
+            if (hasMatch)
+                await fs_1.default.promises.writeFile(filePath, fileText, 'utf-8');
+            else if (!opt?.glob)
+                MiniReq_1.SLogger.error(`UtilDT.commentMacro 无法找到注释 ${commentId}`);
         };
         plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));
     }
@@ -112,18 +148,13 @@ exports.commentMacro = commentMacro;
  * @param opt.glob     - 使用glob匹配而非文件路径
  */
 async function fileMacro(codeText, opt) {
-    const loc = MiniReq_1.UtilFunc.getFuncLoc(2);
-    if (!loc) {
-        MiniReq_1.SLogger.error(`UtilDT.fileMacro 未能找到函数位置`);
-        return;
-    }
     const plist = [];
-    const filePaths = parseMacroPaths(loc.filePath, opt);
+    const filePaths = parseMacroPaths(opt);
     for (const filePath of filePaths) {
         const queuefunc = async () => {
             await MiniReq_1.UtilFT.ensurePathExists(filePath);
             const text = await readFile(filePath);
-            const parseCode = await parseCodeText(codeText, { text, inent: '', filePath });
+            const parseCode = await parseCodeText(codeText, { matchId: '', text, inent: '', filePath });
             await fs_1.default.promises.writeFile(filePath, parseCode, 'utf-8');
         };
         plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));

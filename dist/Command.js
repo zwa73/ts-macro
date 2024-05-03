@@ -21,7 +21,7 @@ async function batchNode(filepath, opt) {
     // 将所有的相对路径转换为绝对路径
     const absolutePaths = filepath.map(fp => path_1.default.resolve(process.cwd(), fp).replaceAll("\\", "/"));
     // 创建一个字符串，其中包含所有文件的 require 语句
-    const requires = absolutePaths.map(fp => `require('${fp}');`).join('\n');
+    const requires = absolutePaths.map(fp => `require('${fp}')`).join(';');
     // 创建并执行 ts-node 命令
     const cmd = `ts-node -r tsconfig-paths/register -e "${requires}" ${opt?.project ? `-P "${opt.project}"` : ""}`;
     await exec(cmd);
