@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'pathe';
 
 
 2

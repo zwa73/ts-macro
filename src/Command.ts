@@ -1,7 +1,7 @@
 
 import { globSync } from 'glob';
 import { Command } from 'commander';
-import path from 'path';
+import path from 'pathe';
 import cp from 'child_process';
 /**执行js/ts的可选项 */
 type BatchNodeOpt = Partial<{
@@ -19,7 +19,7 @@ async function batchNode(filepath:string|string[],opt?:BatchNodeOpt) {
     // 确保 filepath 总是一个数组
     if (!Array.isArray(filepath)) filepath = [filepath];
     // 将所有的相对路径转换为绝对路径
-    const absolutePaths = filepath.map(fp => path.resolve(process.cwd(), fp).replaceAll("\\","/"));
+    const absolutePaths = filepath.map(fp => path.resolve(process.cwd(), fp));
     // 创建一个字符串，其中包含所有文件的 require 语句
     const requires = absolutePaths.map(fp => `require('${fp}')`).join(';');
     // 创建并执行 ts-node 命令
@@ -67,10 +67,10 @@ export function command(){
             const dir = process.cwd();
             const include:string|string[] = opt.include;
             const fixedPath = typeof include === "string"
-                ? path.join(dir,include).replaceAll("\\","/")
-                : include.map((p)=>path.join(dir,p).replaceAll("\\","/"));
+                ? path.join(dir,include)
+                : include.map((p)=>path.join(dir,p));
             const filelist = globSync(fixedPath, { ignore: opt?.ingore, absolute: true })
-                .map((filePath) => path.posix.normalize(filePath.replaceAll("\\", "/")));
+                .map((filePath) => path.normalize(filePath));
             await batchNode(filelist, {
                 project: opt.project,
             });

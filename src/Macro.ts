@@ -1,5 +1,5 @@
 import fs from 'fs';
-import path from 'path';
+import path from 'pathe';
 import { SLogger, UtilFT, UtilFunc, dedent, throwError } from './MiniReq';
 
 
@@ -31,11 +31,11 @@ const parseMacroPaths = (opt?:MacroOpt)=>{
     const basePath = loc?.filePath!;
     return opt?.filePath
         ? opt.glob
-            ? UtilFT.fileSearchGlob(process.cwd(),opt.filePath,{style:"posix"})
+            ? UtilFT.fileSearchGlob(process.cwd(),opt.filePath)
             : typeof opt?.filePath==="string"
-                ? [opt?.filePath.replaceAll('\\','/')]
-                : opt?.filePath.map((filepath)=>filepath.replaceAll('\\','/'))
-        : [basePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/,"$1.$2").replaceAll('\\','/')];
+                ? [opt?.filePath]
+                : opt?.filePath.map((filepath)=>filepath)
+        : [basePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/,"$1.$2")];
 }
 const readFile = async (basePath:string)=>
     (await fs.promises.readFile(basePath,'utf-8')).replaceAll("\r\n","\n");
@@ -99,7 +99,7 @@ export async function regionMacro(regionId:string|RegExp,codeText:string|((opt:C
                 await fs.promises.writeFile(filePath, fileText, 'utf-8');
             else if(!opt?.glob) SLogger.error(`UtilDT.regionMacro 无法找到区域 ${regionId}`);
         }
-        plist.push(UtilFunc.queueProc(path.posix.normalize(filePath.replaceAll("\\","/")),queuefunc))
+        plist.push(UtilFunc.queueProc(path.normalize(filePath),queuefunc))
     }
     await Promise.all(plist);
 }
@@ -157,7 +157,7 @@ export async function commentMacro(commentId:string|RegExp,codeText:string|((opt
                 await fs.promises.writeFile(filePath, fileText, 'utf-8');
             else if(!opt?.glob) SLogger.error(`UtilDT.commentMacro 无法找到注释 ${commentId}`);
         }
-        plist.push(UtilFunc.queueProc(path.posix.normalize(filePath.replaceAll("\\","/")),queuefunc))
+        plist.push(UtilFunc.queueProc(path.normalize(filePath),queuefunc))
     }
     await Promise.all(plist);
 }
@@ -183,7 +183,7 @@ export async function fileMacro(codeText:string|((opt:Omit<CodeTextOpt,'ident'|'
             });
             await fs.promises.writeFile(filePath, parseCode, 'utf-8');
         }
-        plist.push(UtilFunc.queueProc(path.posix.normalize(filePath.replaceAll("\\","/")),queuefunc))
+        plist.push(UtilFunc.queueProc(path.normalize(filePath),queuefunc))
     }
     await Promise.all(plist);
 }

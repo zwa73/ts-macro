@@ -1,15 +1,13 @@
 
 
 import { globSync } from 'glob';
-import path from 'path';
+import path from 'pathe';
 import fs from 'fs';
 
 /**glob搜索选项 */
 type FileSearchGlobOpt = Partial<{
     /**忽略的文件 默认 undefined */
     ingore:string|string[];
-    /**输出的路径风格 默认跟随系统 */
-    style:"posix"|"win32";
 }>
 /**验证文件选项 */
 type EnsurePathExistsOpt = Partial<{
@@ -36,19 +34,9 @@ export namespace UtilFT{
      */
     export function fileSearchGlob(dir: string, globPattern:string|string[],opt?:FileSearchGlobOpt){
         const fixedPath = typeof globPattern === "string"
-            ? path.join(dir,globPattern).replaceAll("\\","/")
-            : globPattern.map((p)=>path.join(dir,p).replaceAll("\\","/"));
-        return globSync(fixedPath, { ignore: opt?.ingore, absolute: true })
-            .map((filePath) => {
-            if (opt?.style === undefined) return filePath;
-            switch(opt.style){
-                case 'posix':
-                    return path['posix'].normalize(filePath.replaceAll("\\", "/"))
-                case 'win32':
-                    return path['win32'].normalize(filePath.replaceAll("/", "\\"))
-            }
-            throw '';
-        });
+            ? path.join(dir,globPattern)
+            : globPattern.map((p)=>path.join(dir,p));
+        return globSync(fixedPath, { ignore: opt?.ingore, absolute: true });
     }
     /**验证路径 文件或文件夹 是否存在 异步
      * @async
