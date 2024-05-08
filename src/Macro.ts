@@ -31,7 +31,7 @@ const parseMacroPaths = (opt?:MacroOpt)=>{
     const basePath = loc?.filePath!;
     return opt?.filePath
         ? opt.glob
-            ? UtilFT.fileSearchGlob(process.cwd(),opt.filePath,{normalize:"posix"})
+            ? UtilFT.fileSearchGlob(process.cwd(),opt.filePath,{style:"posix"})
             : typeof opt?.filePath==="string"
                 ? [opt?.filePath.replaceAll('\\','/')]
                 : opt?.filePath.map((filepath)=>filepath.replaceAll('\\','/'))
