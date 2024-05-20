@@ -23,7 +23,7 @@ async function batchNode(filepath:string|string[],opt?:BatchNodeOpt) {
     // 创建一个字符串，其中包含所有文件的 require 语句
     const requires = absolutePaths.map(fp => `require('${fp}')`).join(';');
     // 创建并执行 ts-node 命令
-    const cmd = `ts-node -r tsconfig-paths/register -e "${requires}" ${opt?.project?`-P "${opt.project}"` : ""}`;
+    const cmd = `npx --no-install ts-node -r tsconfig-paths/register -e "${requires}" ${opt?.project?`-P "${opt.project}"` : ""}`;
     await exec(cmd);
 }
 

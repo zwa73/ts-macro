@@ -2,8 +2,6 @@
 type FileSearchGlobOpt = Partial<{
     /**忽略的文件 默认 undefined */
     ingore: string | string[];
-    /**输出的路径风格 默认跟随系统 */
-    normalize: "posix" | "win32";
 }>;
 /**验证文件选项 */
 type EnsurePathExistsOpt = Partial<{

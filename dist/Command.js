@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.command = void 0;
 const glob_1 = require("glob");
 const commander_1 = require("commander");
-const path_1 = __importDefault(require("path"));
+const pathe_1 = __importDefault(require("pathe"));
 const child_process_1 = __importDefault(require("child_process"));
 /**运行所有js/ts文件
  * @async
@@ -19,11 +19,11 @@ async function batchNode(filepath, opt) {
     if (!Array.isArray(filepath))
         filepath = [filepath];
     // 将所有的相对路径转换为绝对路径
-    const absolutePaths = filepath.map(fp => path_1.default.resolve(process.cwd(), fp).replaceAll("\\", "/"));
+    const absolutePaths = filepath.map(fp => pathe_1.default.resolve(process.cwd(), fp));
     // 创建一个字符串，其中包含所有文件的 require 语句
     const requires = absolutePaths.map(fp => `require('${fp}')`).join(';');
     // 创建并执行 ts-node 命令
-    const cmd = `ts-node -r tsconfig-paths/register -e "${requires}" ${opt?.project ? `-P "${opt.project}"` : ""}`;
+    const cmd = `npx --no-install ts-node -r tsconfig-paths/register -e "${requires}" ${opt?.project ? `-P "${opt.project}"` : ""}`;
     await exec(cmd);
 }
 /**封装的 cp.spawn 执行一段指令，指令运行时实时返回输出
@@ -63,10 +63,10 @@ function command() {
         const dir = process.cwd();
         const include = opt.include;
         const fixedPath = typeof include === "string"
-            ? path_1.default.join(dir, include).replaceAll("\\", "/")
-            : include.map((p) => path_1.default.join(dir, p).replaceAll("\\", "/"));
+            ? pathe_1.default.join(dir, include)
+            : include.map((p) => pathe_1.default.join(dir, p));
         const filelist = (0, glob_1.globSync)(fixedPath, { ignore: opt?.ingore, absolute: true })
-            .map((filePath) => path_1.default.posix.normalize(filePath.replaceAll("\\", "/")));
+            .map((filePath) => pathe_1.default.normalize(filePath));
         await batchNode(filelist, {
             project: opt.project,
         });

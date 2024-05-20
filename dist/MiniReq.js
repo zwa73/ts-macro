@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.throwError = exports.dedent = exports.SLogger = exports.UtilFunc = exports.UtilFT = void 0;
 const glob_1 = require("glob");
-const path_1 = __importDefault(require("path"));
+const pathe_1 = __importDefault(require("pathe"));
 const fs_1 = __importDefault(require("fs"));
 var UtilFT;
 (function (UtilFT) {
@@ -19,20 +19,9 @@ var UtilFT;
      */
     function fileSearchGlob(dir, globPattern, opt) {
         const fixedPath = typeof globPattern === "string"
-            ? path_1.default.join(dir, globPattern).replaceAll("\\", "/")
-            : globPattern.map((p) => path_1.default.join(dir, p).replaceAll("\\", "/"));
-        return (0, glob_1.globSync)(fixedPath, { ignore: opt?.ingore, absolute: true })
-            .map((filePath) => {
-            if (opt?.normalize === undefined)
-                return filePath;
-            switch (opt.normalize) {
-                case 'posix':
-                    return path_1.default['posix'].normalize(filePath.replaceAll("\\", "/"));
-                case 'win32':
-                    return path_1.default['win32'].normalize(filePath.replaceAll("/", "\\"));
-            }
-            throw '';
-        });
+            ? pathe_1.default.join(dir, globPattern)
+            : globPattern.map((p) => pathe_1.default.join(dir, p));
+        return (0, glob_1.globSync)(fixedPath, { ignore: opt?.ingore, absolute: true });
     }
     UtilFT.fileSearchGlob = fileSearchGlob;
     /**验证路径 文件或文件夹 是否存在 异步
@@ -72,13 +61,13 @@ var UtilFT;
      */
     async function createPath(filePath, opt) {
         if (opt?.dir == true)
-            filePath = path_1.default.join(filePath, path_1.default.sep);
+            filePath = pathe_1.default.join(filePath, pathe_1.default.sep);
         try {
-            if (filePath.endsWith(path_1.default.sep)) {
+            if (filePath.endsWith(pathe_1.default.sep)) {
                 await fs_1.default.promises.mkdir(filePath, { recursive: true });
                 return true;
             }
-            await fs_1.default.promises.mkdir(path_1.default.dirname(filePath), { recursive: true });
+            await fs_1.default.promises.mkdir(pathe_1.default.dirname(filePath), { recursive: true });
             const filehandle = await fs_1.default.promises.open(filePath, 'w');
             await filehandle.close();
             return true;

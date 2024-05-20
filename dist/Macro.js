@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fileMacro = exports.commentMacro = exports.regionMacro = void 0;
 const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
+const pathe_1 = __importDefault(require("pathe"));
 const MiniReq_1 = require("./MiniReq");
 //#region macro工具
 const parseMacroPaths = (opt) => {
@@ -15,11 +15,11 @@ const parseMacroPaths = (opt) => {
     const basePath = loc?.filePath;
     return opt?.filePath
         ? opt.glob
-            ? MiniReq_1.UtilFT.fileSearchGlob(process.cwd(), opt.filePath, { normalize: "posix" })
+            ? MiniReq_1.UtilFT.fileSearchGlob(process.cwd(), opt.filePath)
             : typeof opt?.filePath === "string"
-                ? [opt?.filePath.replaceAll('\\', '/')]
-                : opt?.filePath.map((filepath) => filepath.replaceAll('\\', '/'))
-        : [basePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/, "$1.$2").replaceAll('\\', '/')];
+                ? [opt?.filePath]
+                : opt?.filePath.map((filepath) => filepath)
+        : [basePath.replace(/(.+)\.macro\.(js|ts|cjs|mjs)$/, "$1.$2")];
 };
 const readFile = async (basePath) => (await fs_1.default.promises.readFile(basePath, 'utf-8')).replaceAll("\r\n", "\n");
 const parseCodeText = async (codeText, opt) => {
@@ -80,7 +80,7 @@ async function regionMacro(regionId, codeText, opt) {
             else if (!opt?.glob)
                 MiniReq_1.SLogger.error(`UtilDT.regionMacro 无法找到区域 ${regionId}`);
         };
-        plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));
+        plist.push(MiniReq_1.UtilFunc.queueProc(pathe_1.default.normalize(filePath), queuefunc));
     }
     await Promise.all(plist);
 }
@@ -138,7 +138,7 @@ async function commentMacro(commentId, codeText, opt) {
             else if (!opt?.glob)
                 MiniReq_1.SLogger.error(`UtilDT.commentMacro 无法找到注释 ${commentId}`);
         };
-        plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));
+        plist.push(MiniReq_1.UtilFunc.queueProc(pathe_1.default.normalize(filePath), queuefunc));
     }
     await Promise.all(plist);
 }
@@ -165,7 +165,7 @@ async function fileMacro(codeText, opt) {
             });
             await fs_1.default.promises.writeFile(filePath, parseCode, 'utf-8');
         };
-        plist.push(MiniReq_1.UtilFunc.queueProc(path_1.default.posix.normalize(filePath.replaceAll("\\", "/")), queuefunc));
+        plist.push(MiniReq_1.UtilFunc.queueProc(pathe_1.default.normalize(filePath), queuefunc));
     }
     await Promise.all(plist);
 }
